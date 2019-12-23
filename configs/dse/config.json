@@ -1,0 +1,6 @@
+{
+    "hello": "Hello, dse from config file!",
+    "producerCertFilePath": "./test/certs/pad.kafka.producer.cer.pem",
+    "producerKeyFilePath": "./test/certs/pad.kafka.producer.key.pem",
+    "portappCAFilePath": "./test/certs/portapp-ca-1.crt"
+}

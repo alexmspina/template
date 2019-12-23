@@ -1,0 +1,6 @@
+{
+    "hello": "Hello, pglient from config file!",
+    "postgresCertFilePath": "./test/certs/pad.postgres.client.cer.pem",
+    "postgresKeyFilePath": "./test/certs/pad.postgres.client.key.pem",
+    "rootCaFilePath": "./test/certs/portapp-ca-1.crt"
+}

@@ -1,0 +1,11 @@
+# devenv data
+/deployments/pad/volumes/
+
+# ignore portapp executables
+portapp
+dse
+
+# ignore certs
+# run create-certs to get your own
+# dev certs and protect them
+/test/certs/
