@@ -1,5 +1,0 @@
-ssl.key.location=/Users/alexspina/Projects/portapp/deployments/pad/certs/kafkacat.key.pem
-ssl.key.password=portapp
-ssl.certificate.location=/Users/alexspina/Projects/portapp/deployments/pad/certs/kafkacat.cer.pem
-ssl.ca.location=/Users/alexspina/Projects/portapp/deployments/pad/certs/portapp-ca-1.crt
-security.protocol=SSL

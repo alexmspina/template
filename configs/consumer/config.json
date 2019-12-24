@@ -1,6 +1,0 @@
-{
-    "hello": "Hello, consumer from config file!",
-    "consumerCertFilePath": "./test/certs/pad.kafka.consumer.cer.pem",
-    "consumerKeyFilePath": "./test/certs/pad.kafka.consumer.key.pem",
-    "portappCAFilePath": "./test/certs/portapp-ca-1.crt"
-}
