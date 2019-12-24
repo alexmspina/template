@@ -1,13 +1,11 @@
 # devenv data
-/deployments/pad/volumes/
+/deployments/sales_data/volumes/
 
 # go dependencies
 /vendor/modules/download/
 /vendor/modules/vcs/
 
-# ignore portapp executables
-portapp
-dse
+# ignore template executables
 
 # ignore certs
 # run create-certs to get your own
