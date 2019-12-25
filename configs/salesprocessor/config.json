@@ -1,0 +1,6 @@
+{
+    "certFile": "./test/certs/localhost.cer.pem",
+    "keyFile": "./test/certs/localhost.key.pem",
+    "caFile": "./test/certs/salesadmin-ca-1.crt",
+    "port": ":50051"
+}

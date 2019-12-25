@@ -9,7 +9,7 @@ set -o nounset \
 openssl req -new -x509 -keyout ../certs/salesadmin-ca-1.key -out ../certs/salesadmin-ca-1.crt -days 365 -subj '/CN=ca1' -passin pass:salesadmin -passout pass:salesadmin
 # openssl req -new -x509 -keyout salesadmin-ca-2.key -out salesadmin-ca-2.crt -days 365 -subj '/CN=ca2.test/OU=TEST/O=SALESADMIN/L=Washington/S=DC/C=US' -passin pass:salesadmin -passout pass:salesadmin
 
-for i in sales_admin.postgres.client postgres sales_admin.grpc.client localhost
+for i in salesadmin.postgres.client postgres salesadmin.grpc.client localhost
     echo $i
     # Create keystores
     keytool -genkey -noprompt \
