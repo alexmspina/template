@@ -1,5 +1,5 @@
 # devenv data
-/deployments/salesadmin/volumes
+/deployments/salesadmin/volumes/
 
 # go dependencies
 /vendor/modules/download/
