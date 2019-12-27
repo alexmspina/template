@@ -42,3 +42,24 @@ services:
       - ./volumes/certdev/.config/nvim/plugged:/root/.config/nvim/plugged
     stdin_open: true
     tty: true
+  
+  server:
+    build:
+      context: ../..
+      dockerfile: ./build/salesadmin/Dockerfile
+    image: template/salesadmin
+    ports:
+      - target: 50051
+        published: 50051
+        protocol: tcp
+        mode: host
+
+  envoy:
+    build:
+      context: ../..
+      dockerfile: ./build/envoy/Dockerfile
+    image: grpcweb/envoy
+    ports:
+      - "8080:8080"
+    links:
+      - server
