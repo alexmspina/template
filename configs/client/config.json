@@ -1,5 +1,5 @@
 {
     "salesFile": "./test/data/salesdata.csv",
-    "salesProcessorAddress": "localhost:50051",
+    "salesAdminAddress": "localhost:50051",
     "certFile": "./test/certs/salesadmin.grpc.client.cer.pem"
 }
