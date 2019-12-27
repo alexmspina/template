@@ -1,10 +1,10 @@
 package main
 
 import (
-	"fmt"
 	"github.com/alexmspina/template/internal/salesadmin"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"go.uber.org/zap"
 )
 
 func main() {
@@ -21,18 +21,51 @@ var (
 
 // Execute executes the root command.
 func Execute() error {
+	// configure logger
+	logger, _ := zap.NewProduction()
+	defer logger.Sync()
+	sugar := logger.Sugar()
+
+	sugar.Info("executing root command")
 	return rootCmd.Execute()
 }
 
 func init() {
+	// configure logger
+	logger, _ := zap.NewProduction()
+	defer logger.Sync()
+	sugar := logger.Sugar()
+
+	// check for config files
+	sugar.Info("checking for config files")
 	viper.SetConfigName("config")
-	viper.AddConfigPath("./configs/salesadmin")
+	viper.AddConfigPath("./configs/salesadmin/dev")
+	viper.AddConfigPath(".")
+
+	// set default config values
+	sugar.Info("setting default config values")
+	viper.SetDefault("certFile", "./server.cer.pem")
+	viper.SetDefault("keyFile", "./server.key.pem")
+	viper.SetDefault("caFile", "./salesadmin-ca-1.crt")
+	viper.SetDefault("port", ":50051")
+	viper.SetDefault("postgresCertFile", "./postgres.cer.pem")
+	viper.SetDefault("postgresKeyFile", "./postgres.key.pem")
+	viper.SetDefault("postgresHost", "postgres")
+	viper.SetDefault("postgresPort", 5432)
+	viper.SetDefault("postgresUser", "salesadmin")
+	viper.SetDefault("postgresDB", "salesadmin")
+	viper.SetDefault("postgresPassword", "salesadmin")
 
 	err := viper.ReadInConfig()
 	if err != nil {
-		panic(fmt.Errorf("fatal error config file %s", err))
+		sugar.Debug(" error reading config values")
+	} else {
+		for k, v := range viper.AllSettings() {
+			sugar.Infof("Config parameter %v: %v", k, v)
+		}
 	}
 
+	sugar.Info("configuring subcommands")
 	rootCmd.AddCommand(startCmd)
 }
 
