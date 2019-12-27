@@ -1,0 +1,46 @@
+syntax = "proto3";
+
+package salesadmin;
+option go_package = "salesadminpb";
+
+message File {
+  string file_name = 1;
+  repeated bytes file_bytes = 2;
+}
+
+message FileUploadRequest {
+    File file = 1;
+}
+
+message FileUploadResponse { bool result = 1; }
+
+message Order {
+  int32 order_id = 1;
+  string customer_name = 2;
+  string item_description = 3;
+  double item_price = 4;
+  int64 quantity = 5;
+  string merchant_name = 6;
+  string merchant_address = 7;
+}
+
+message OrdersRequest {}
+
+message OrdersResponse {
+  repeated Order orders = 1;
+}
+
+message TotalSalesRevenueRequest {}
+
+message TotalSalesRevenueResponse {
+  double total_revenue = 1;
+}
+
+service SalesAdminService {
+  // unary rpc to upload a file to the gRPC server
+  rpc FileUpload(FileUploadRequest) returns (FileUploadResponse) {};
+  // unary rpc to query the server for all orders
+  rpc GetAllOrders(OrdersRequest) returns (OrdersResponse) {};
+  // unary rpc to query the server for the total sales revenue
+  rpc GetTotalSalesRevenue(TotalSalesRevenueRequest) returns (TotalSalesRevenueResponse) {};
+}
