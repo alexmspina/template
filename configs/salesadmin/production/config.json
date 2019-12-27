@@ -1,0 +1,13 @@
+{
+    "certFile": "./server.cer.pem",
+    "keyFile": "./server.key.pem",
+    "caFile": "./salesadmin-ca-1.crt",
+    "port": ":50051",
+    "postgresCertFile": "./postgres.cer.pem",
+    "postgresKeyFile": "./postgres.key.pem",
+    "postgresHost": "postgres",
+    "postgresPort": 5432,
+    "postgresUser": "salesadmin",
+    "postgresDB": "salesadmin",
+    "postgresPassword": "salesadmin"
+}
