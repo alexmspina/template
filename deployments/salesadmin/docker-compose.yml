@@ -21,6 +21,11 @@ services:
 
   godev:
     image: template/godev
+    ports:
+      - target: 3000
+        published: 3000
+        protocol: tcp
+        mode: host
     volumes:
       - ../..:/root/project
       - ../../vendor/modules:/go/pkg/mod/cache
