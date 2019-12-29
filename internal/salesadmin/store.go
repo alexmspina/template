@@ -34,6 +34,10 @@ const queryAllOrders = `SELECT order_id, customer_name, item_description, item_p
 
 const queryRevenueTotal = `SELECT item_price, quantity FROM orders;`
 
+const queryCustomerNames = `SELECT customer_name FROM orders;`
+
+const queryMerchantNames = `SELECT merchant_name FROM orders;`
+
 // ParseSalesFile takes the sales data csv slice of byte slices
 // and unmarshals it into a slice of Order structs
 func ParseSalesFile(ctx context.Context, file [][]byte) ([]Order, error) {
@@ -196,6 +200,98 @@ func RunQueryTotalRevenue(ctx context.Context, query string) ([]Order, error) {
 	var orders []Order
 	for rows.Next() {
 		err = rows.Scan(&order.ItemPrice, &order.Quantity)
+		if err != nil {
+			scanRowError := fmt.Errorf("error scan row %v", err)
+			return nil, scanRowError
+		}
+		orders = append(orders, order)
+	}
+
+	err = rows.Err()
+	if err != nil {
+		panic(err)
+	}
+
+	return orders, nil
+}
+
+// RunQueryCustomerNames executes the provided query string
+func RunQueryCustomerNames(ctx context.Context, query string) ([]Order, error) {
+	// configure logger
+	logger, _ := zap.NewProduction()
+	defer logger.Sync()
+	sugar := logger.Sugar()
+
+	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslkey=%s sslcert=%s sslrootcert=%s sslmode=verify-ca",
+		viper.GetString("postgresHost"), viper.GetInt("postgresPort"), viper.GetString("postgresUser"), viper.GetString("postgresPassword"),
+		viper.GetString("postgresDB"), viper.GetString("postgresKeyFile"), viper.GetString("postgresCertFile"), viper.GetString("caFile"))
+
+	sugar.Info("connecting to postgres salesadmin database")
+	db, err := sql.Open("postgres", psqlInfo)
+	if err != nil {
+		dbConnectionError := fmt.Errorf("error %v while opening db connection", err)
+		return nil, dbConnectionError
+	}
+	defer db.Close()
+
+	sugar.Info("querying database for all customer names")
+	rows, err := db.QueryContext(ctx, query)
+	if err != nil {
+		queryAllOrdersError := fmt.Errorf("error %v recevied while querying database", err)
+		return nil, queryAllOrdersError
+	}
+
+	sugar.Info("scanning result rows and unmarshalling into Order structs")
+	var order Order
+	var orders []Order
+	for rows.Next() {
+		err = rows.Scan(&order.CustomerName)
+		if err != nil {
+			scanRowError := fmt.Errorf("error scan row %v", err)
+			return nil, scanRowError
+		}
+		orders = append(orders, order)
+	}
+
+	err = rows.Err()
+	if err != nil {
+		panic(err)
+	}
+
+	return orders, nil
+}
+
+// RunQueryMerchantNames executes the provided query string
+func RunQueryMerchantNames(ctx context.Context, query string) ([]Order, error) {
+	// configure logger
+	logger, _ := zap.NewProduction()
+	defer logger.Sync()
+	sugar := logger.Sugar()
+
+	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslkey=%s sslcert=%s sslrootcert=%s sslmode=verify-ca",
+		viper.GetString("postgresHost"), viper.GetInt("postgresPort"), viper.GetString("postgresUser"), viper.GetString("postgresPassword"),
+		viper.GetString("postgresDB"), viper.GetString("postgresKeyFile"), viper.GetString("postgresCertFile"), viper.GetString("caFile"))
+
+	sugar.Info("connecting to postgres salesadmin database")
+	db, err := sql.Open("postgres", psqlInfo)
+	if err != nil {
+		dbConnectionError := fmt.Errorf("error %v while opening db connection", err)
+		return nil, dbConnectionError
+	}
+	defer db.Close()
+
+	sugar.Info("querying database for all merchant names")
+	rows, err := db.QueryContext(ctx, query)
+	if err != nil {
+		queryAllOrdersError := fmt.Errorf("error %v recevied while querying database", err)
+		return nil, queryAllOrdersError
+	}
+
+	sugar.Info("scanning result rows and unmarshalling into Order structs")
+	var order Order
+	var orders []Order
+	for rows.Next() {
+		err = rows.Scan(&order.MerchantName)
 		if err != nil {
 			scanRowError := fmt.Errorf("error scan row %v", err)
 			return nil, scanRowError

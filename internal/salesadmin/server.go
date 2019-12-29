@@ -63,7 +63,7 @@ func (s *server) FileUpload(ctx context.Context, in *pb.FileUploadRequest) (*pb.
 	return &pb.FileUploadResponse{Result: true}, nil
 }
 
-// ServeOrders implements the Orders methods of the SalesAdminServiceServer
+// GetAllOrders implements the Orders methods of the SalesAdminServiceServer
 func (s *server) GetAllOrders(ctx context.Context, in *pb.OrdersRequest) (*pb.OrdersResponse, error) {
 	// configure logger
 	logger, _ := zap.NewProduction()
@@ -99,30 +99,63 @@ func (s *server) GetAllOrders(ctx context.Context, in *pb.OrdersRequest) (*pb.Or
 	return &response, nil
 }
 
-// ServeTotalRevenue implements the Orders methods of the SalesAdminServiceServer
-func (s *server) GetTotalSalesRevenue(ctx context.Context, in *pb.TotalSalesRevenueRequest) (*pb.TotalSalesRevenueResponse, error) {
+// GetCustomerCount implements the Orders method of the SalesAdminServiceServer
+func (s *server) GetCustomerCount(ctx context.Context, in *pb.CustomerCountRequest) (*pb.CustomerCountResponse, error) {
 	// configure logger
 	logger, _ := zap.NewProduction()
 	defer logger.Sync()
 	sugar := logger.Sugar()
 
-	sugar.Info("calliong RunQueryTotalRevenue method")
-	orders, err := RunQueryTotalRevenue(ctx, queryRevenueTotal)
+	sugar.Info("calling RunQueryCustomerNames method")
+	orders, err := RunQueryCustomerNames(ctx, queryCustomerNames)
 	if err != nil {
 		return nil, err
 	}
 
-	sugar.Info("calculating total revenue")
-	var totalRevenue float64
+	sugar.Info("calculating unique customer count")
+	customerSet := make(map[string]bool, 0)
 	for _, order := range orders {
-		price := order.ItemPrice
-		quantity := float64(order.Quantity)
-		totalRevenue = float64(totalRevenue) + price*quantity
+		customer := order.CustomerName
+		if _, ok := customerSet[customer]; ok {
+			continue
+		}
+		customerSet[customer] = true
 	}
 
 	sugar.Info("creating TotalSalesRevenueResponse for gRPC method GetTotalSalesRevenue")
-	response := pb.TotalSalesRevenueResponse{
-		TotalRevenue: totalRevenue,
+	response := pb.CustomerCountResponse{
+		Count: int64(len(customerSet)),
+	}
+
+	return &response, nil
+}
+
+// GetMerchantCount implements the GetMerchantCount method of the SalesAdminServiceServer
+func (s *server) GetMerchantCount(ctx context.Context, in *pb.MerchantCountRequest) (*pb.MerchantCountResponse, error) {
+	// configure logger
+	logger, _ := zap.NewProduction()
+	defer logger.Sync()
+	sugar := logger.Sugar()
+
+	sugar.Info("calling RunQueryMerchantNames method")
+	orders, err := RunQueryMerchantNames(ctx, queryMerchantNames)
+	if err != nil {
+		return nil, err
+	}
+
+	sugar.Info("calculating unique merchant count")
+	merchantSet := make(map[string]bool, 0)
+	for _, order := range orders {
+		merchant := order.MerchantName
+		if _, ok := merchantSet[merchant]; ok {
+			continue
+		}
+		merchantSet[merchant] = true
+	}
+
+	sugar.Info("creating TotalSalesRevenueResponse for gRPC method GetTotalSalesRevenue")
+	response := pb.MerchantCountResponse{
+		Count: int64(len(merchantSet)),
 	}
 
 	return &response, nil
