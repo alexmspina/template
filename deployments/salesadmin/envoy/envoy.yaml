@@ -22,7 +22,7 @@ static_resources:
               routes:
               - match: { prefix: "/" }
                 route:
-                  cluster: salesadmin_service
+                  cluster: server
                   max_grpc_timeout: 0s
               cors:
                 allow_origin:
@@ -36,9 +36,17 @@ static_resources:
           - name: envoy.cors
           - name: envoy.router
   clusters:
-  - name: salesadmin_service
+  - name: server
     connect_timeout: 0.25s
     type: logical_dns
     http2_protocol_options: {}
     lb_policy: round_robin
-    hosts: [{ socket_address: { address: server, port_value: 50051 }}]
+    load_assignment:
+      cluster_name: server
+      endpoints:
+      - lb_endpoints:
+        - endpoint:
+            address:
+              socket_address:
+                address: server
+                port_value: 9090

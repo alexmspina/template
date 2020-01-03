@@ -2,7 +2,7 @@
     "certFile": "./server.cer.pem",
     "keyFile": "./server.key.pem",
     "caFile": "./salesadmin-ca-1.crt",
-    "port": ":50051",
+    "port": "0.0.0.0:9090",
     "postgresCertFile": "./postgres.cer.pem",
     "postgresKeyFile": "./postgres.key.pem",
     "postgresHost": "postgres",
