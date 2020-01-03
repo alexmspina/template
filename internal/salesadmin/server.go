@@ -2,13 +2,13 @@ package salesadmin
 
 import (
 	"context"
+	"fmt"
 	"net"
 
 	pb "github.com/alexmspina/template/api/salesadminpb"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials"
 )
 
 type server struct {
@@ -23,7 +23,7 @@ func Start() {
 	sugar := logger.Sugar()
 
 	sugar.Info("configuring gRPC credentials")
-	creds, _ := credentials.NewServerTLSFromFile(viper.GetString("certFile"), viper.GetString("keyFile"))
+	// creds, _ := credentials.NewServerTLSFromFile(viper.GetString("certFile"), viper.GetString("keyFile"))
 
 	sugar.Infof("configuring gRPC listening on port %v", viper.GetString("port"))
 	lis, err := net.Listen("tcp", viper.GetString("port"))
@@ -32,7 +32,8 @@ func Start() {
 	}
 
 	sugar.Info("starting SalesAdminServer")
-	s := grpc.NewServer(grpc.Creds(creds))
+	// s := grpc.NewServer(grpc.Creds(creds))
+	s := grpc.NewServer()
 	pb.RegisterSalesAdminServiceServer(s, &server{})
 	if err := s.Serve(lis); err != nil {
 		sugar.Fatalf("failed to serve: %v", err)
@@ -48,6 +49,14 @@ func (s *server) FileUpload(ctx context.Context, in *pb.FileUploadRequest) (*pb.
 
 	sugar.Info("reading FileUploadRequest FileBytes payload")
 	file := in.GetFile()
+	fmt.Printf("file from upload request: %v\n\n", file)
+	if file.FileBytes == nil {
+		sugar.Debugf("file bytes missing", file)
+		errString := "file bytes missing"
+		err := fmt.Errorf("error %v", errString)
+		return &pb.FileUploadResponse{Result: false}, err
+	}
+	sugar.Debugf("file bytes not missing", file)
 	fileBytes := file.FileBytes
 	orders, err := ParseSalesFile(ctx, fileBytes)
 	if err != nil {
@@ -94,6 +103,35 @@ func (s *server) GetAllOrders(ctx context.Context, in *pb.OrdersRequest) (*pb.Or
 	sugar.Info("creating OrderResponse payload for gRPC GetAllOrders")
 	response := pb.OrdersResponse{
 		Orders: allOrders,
+	}
+
+	return &response, nil
+}
+
+// ServeTotalRevenue implements the Orders methods of the SalesAdminServiceServer
+func (s *server) GetTotalSalesRevenue(ctx context.Context, in *pb.TotalSalesRevenueRequest) (*pb.TotalSalesRevenueResponse, error) {
+	// configure logger
+	logger, _ := zap.NewProduction()
+	defer logger.Sync()
+	sugar := logger.Sugar()
+
+	sugar.Info("calliong RunQueryTotalRevenue method")
+	orders, err := RunQueryTotalRevenue(ctx, queryRevenueTotal)
+	if err != nil {
+		return nil, err
+	}
+
+	sugar.Info("calculating total revenue")
+	var totalRevenue float64
+	for _, order := range orders {
+		price := order.ItemPrice
+		quantity := float64(order.Quantity)
+		totalRevenue = float64(totalRevenue) + price*quantity
+	}
+
+	sugar.Info("creating TotalSalesRevenueResponse for gRPC method GetTotalSalesRevenue")
+	response := pb.TotalSalesRevenueResponse{
+		TotalRevenue: totalRevenue,
 	}
 
 	return &response, nil

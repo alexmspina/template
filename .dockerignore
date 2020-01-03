@@ -1,6 +1,9 @@
 # devenv data
 /deployments/salesadmin/volumes/
 
+# node_modules
+/web/salesadmin/node_modules
+
 # ignore portapp executables
 portapp
 dse

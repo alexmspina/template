@@ -20,6 +20,9 @@ services:
       - ../../scripts/postgres/init-db-tables.sh:/docker-entrypoint-initdb.d/init-user-db.sh
 
   godev:
+    build:
+      context: ../..
+      dockerfile: ./build/godev/Dockerfile
     image: template/godev
     ports:
       - target: 3000
@@ -37,6 +40,9 @@ services:
     tty: true
 
   certdev:
+    build:
+      context: ../..
+      dockerfile: ./build/certdev/Dockerfile
     image: template/certdev
     volumes:
       - ../../test/certs:/root/certs
@@ -54,7 +60,7 @@ services:
       dockerfile: ./build/salesadmin/Dockerfile
     image: template/salesadmin
     ports:
-      - target: 50051
+      - target: 9090
         published: 50051
         protocol: tcp
         mode: host
@@ -63,8 +69,9 @@ services:
     build:
       context: ../..
       dockerfile: ./build/envoy/Dockerfile
-    image: grpcweb/envoy
+    image: template/envoy
     ports:
       - "8080:8080"
+      - "9901:9901"
     links:
       - server

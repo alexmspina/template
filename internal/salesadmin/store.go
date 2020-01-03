@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"encoding/csv"
 	"fmt"
+	"reflect"
 	"strconv"
 	"strings"
 
@@ -63,13 +64,22 @@ func ParseSalesFile(ctx context.Context, file [][]byte) ([]Order, error) {
 
 		itemPrice, err := strconv.ParseFloat(record[2], 64)
 		if err != nil {
-			parseFloatError := fmt.Errorf("error %v while converting item price to float64 in row %v", err, i)
+			parseFloatError := fmt.Errorf("%v converting item price to float64 in row %v", err, i)
 			return nil, parseFloatError
 		}
 
-		itemQuantity, err := strconv.ParseInt(record[3], 2, 16)
+		// itemQuantity, err := strconv.ParseInt(record[3], 2, 16)
+		itemQuantity, err := strconv.Atoi(record[3])
 		if err != nil {
-			parseIntError := fmt.Errorf("error %v while converting item quantity to int in row %v", err, i)
+			if err.Error() == "invalid syntax" {
+				fmt.Println(err.Error())
+				itemString, err := strconv.Atoi(record[3])
+				if err != nil {
+					fmt.Printf("error %v", err)
+				}
+				fmt.Printf("itemString %v\n", itemString)
+			}
+			parseIntError := fmt.Errorf("%v converting item quantity to int in row %v %v %v", err, i, record[3], reflect.TypeOf(record[3]))
 			return nil, parseIntError
 		}
 
@@ -77,7 +87,7 @@ func ParseSalesFile(ctx context.Context, file [][]byte) ([]Order, error) {
 			CustomerName:    record[0],
 			ItemDescription: record[1],
 			ItemPrice:       itemPrice,
-			Quantity:        itemQuantity,
+			Quantity:        int64(itemQuantity),
 			MerchantName:    record[4],
 			MerchantAddress: record[5],
 		}
@@ -95,9 +105,12 @@ func InsertOrders(ctx context.Context, orders []Order) error {
 	defer logger.Sync()
 	sugar := logger.Sugar()
 
-	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslkey=%s sslcert=%s sslrootcert=%s sslmode=verify-ca",
+	// psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslkey=%s sslcert=%s sslrootcert=%s sslmode=verify-ca",
+	// viper.GetString("postgresHost"), viper.GetInt("postgresPort"), viper.GetString("postgresUser"), viper.GetString("postgresPassword"),
+	// viper.GetString("postgresDB"), viper.GetString("postgresKeyFile"), viper.GetString("postgresCertFile"), viper.GetString("caFile"))
+	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
 		viper.GetString("postgresHost"), viper.GetInt("postgresPort"), viper.GetString("postgresUser"), viper.GetString("postgresPassword"),
-		viper.GetString("postgresDB"), viper.GetString("postgresKeyFile"), viper.GetString("postgresCertFile"), viper.GetString("caFile"))
+		viper.GetString("postgresDB"))
 
 	sugar.Info("connecting to postgres salesadmin database")
 	db, err := sql.Open("postgres", psqlInfo)
@@ -128,9 +141,12 @@ func RunQueryAllOrders(ctx context.Context, query string) ([]Order, error) {
 	defer logger.Sync()
 	sugar := logger.Sugar()
 
-	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslkey=%s sslcert=%s sslrootcert=%s sslmode=verify-ca",
+	// psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslkey=%s sslcert=%s sslrootcert=%s sslmode=verify-ca",
+	// viper.GetString("postgresHost"), viper.GetInt("postgresPort"), viper.GetString("postgresUser"), viper.GetString("postgresPassword"),
+	// viper.GetString("postgresDB"), viper.GetString("postgresKeyFile"), viper.GetString("postgresCertFile"), viper.GetString("caFile"))
+	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
 		viper.GetString("postgresHost"), viper.GetInt("postgresPort"), viper.GetString("postgresUser"), viper.GetString("postgresPassword"),
-		viper.GetString("postgresDB"), viper.GetString("postgresKeyFile"), viper.GetString("postgresCertFile"), viper.GetString("caFile"))
+		viper.GetString("postgresDB"))
 
 	sugar.Info("connecting to database")
 	db, err := sql.Open("postgres", psqlInfo)
@@ -176,9 +192,12 @@ func RunQueryTotalRevenue(ctx context.Context, query string) ([]Order, error) {
 	defer logger.Sync()
 	sugar := logger.Sugar()
 
-	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslkey=%s sslcert=%s sslrootcert=%s sslmode=verify-ca",
+	// psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslkey=%s sslcert=%s sslrootcert=%s sslmode=verify-ca",
+	// viper.GetString("postgresHost"), viper.GetInt("postgresPort"), viper.GetString("postgresUser"), viper.GetString("postgresPassword"),
+	// viper.GetString("postgresDB"), viper.GetString("postgresKeyFile"), viper.GetString("postgresCertFile"), viper.GetString("caFile"))
+	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
 		viper.GetString("postgresHost"), viper.GetInt("postgresPort"), viper.GetString("postgresUser"), viper.GetString("postgresPassword"),
-		viper.GetString("postgresDB"), viper.GetString("postgresKeyFile"), viper.GetString("postgresCertFile"), viper.GetString("caFile"))
+		viper.GetString("postgresDB"))
 
 	sugar.Info("connecting to postgres salesadmin database")
 	db, err := sql.Open("postgres", psqlInfo)
@@ -222,9 +241,12 @@ func RunQueryCustomerNames(ctx context.Context, query string) ([]Order, error) {
 	defer logger.Sync()
 	sugar := logger.Sugar()
 
-	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslkey=%s sslcert=%s sslrootcert=%s sslmode=verify-ca",
+	// psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslkey=%s sslcert=%s sslrootcert=%s sslmode=verify-ca",
+	// viper.GetString("postgresHost"), viper.GetInt("postgresPort"), viper.GetString("postgresUser"), viper.GetString("postgresPassword"),
+	// viper.GetString("postgresDB"), viper.GetString("postgresKeyFile"), viper.GetString("postgresCertFile"), viper.GetString("caFile"))
+	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
 		viper.GetString("postgresHost"), viper.GetInt("postgresPort"), viper.GetString("postgresUser"), viper.GetString("postgresPassword"),
-		viper.GetString("postgresDB"), viper.GetString("postgresKeyFile"), viper.GetString("postgresCertFile"), viper.GetString("caFile"))
+		viper.GetString("postgresDB"))
 
 	sugar.Info("connecting to postgres salesadmin database")
 	db, err := sql.Open("postgres", psqlInfo)
@@ -268,9 +290,12 @@ func RunQueryMerchantNames(ctx context.Context, query string) ([]Order, error) {
 	defer logger.Sync()
 	sugar := logger.Sugar()
 
-	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslkey=%s sslcert=%s sslrootcert=%s sslmode=verify-ca",
+	// psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslkey=%s sslcert=%s sslrootcert=%s sslmode=verify-ca",
+	// viper.GetString("postgresHost"), viper.GetInt("postgresPort"), viper.GetString("postgresUser"), viper.GetString("postgresPassword"),
+	// viper.GetString("postgresDB"), viper.GetString("postgresKeyFile"), viper.GetString("postgresCertFile"), viper.GetString("caFile"))
+	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
 		viper.GetString("postgresHost"), viper.GetInt("postgresPort"), viper.GetString("postgresUser"), viper.GetString("postgresPassword"),
-		viper.GetString("postgresDB"), viper.GetString("postgresKeyFile"), viper.GetString("postgresCertFile"), viper.GetString("caFile"))
+		viper.GetString("postgresDB"))
 
 	sugar.Info("connecting to postgres salesadmin database")
 	db, err := sql.Open("postgres", psqlInfo)
