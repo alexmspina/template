@@ -1,9 +1,9 @@
 #-------------------------------------------------------------------------------------------------------------
 # author: Alex Spina
-# license: Have your way with me.
+# license: ...
 # date: 12/22/2019
 #-------------------------------------------------------------------------------------------------------------
-FROM alexmspina/godev:v1.0.1
+FROM alexmspina/godev:v1.0.2
 #
 ## Copy init.vim to container so plug can install vim packages
 COPY ./build/godev/init.vim /root/.config/nvim/init.vim

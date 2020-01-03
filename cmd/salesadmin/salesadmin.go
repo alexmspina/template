@@ -47,7 +47,7 @@ func init() {
 	viper.SetDefault("certFile", "./server.cer.pem")
 	viper.SetDefault("keyFile", "./server.key.pem")
 	viper.SetDefault("caFile", "./salesadmin-ca-1.crt")
-	viper.SetDefault("port", ":50051")
+	viper.SetDefault("port", ":9090")
 	viper.SetDefault("postgresCertFile", "./postgres.cer.pem")
 	viper.SetDefault("postgresKeyFile", "./postgres.key.pem")
 	viper.SetDefault("postgresHost", "postgres")
