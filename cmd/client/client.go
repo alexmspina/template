@@ -12,7 +12,6 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials"
 )
 
 var (
@@ -45,15 +44,18 @@ func init() {
 	rootCmd.AddCommand(uploadCmd)
 	rootCmd.AddCommand(getOrdersCmd)
 	rootCmd.AddCommand(getTotalRevenueCmd)
+	rootCmd.AddCommand(getCustomerCountCmd)
+	rootCmd.AddCommand(getMerchantCountCmd)
 }
 
 // getOrders implements the NewSalesAdminClient interface and requests
 // all orders from the salesadmin api
 func getOrders() {
-	creds, _ := credentials.NewClientTLSFromFile(viper.GetString("certFile"), "")
+	// creds, _ := credentials.NewClientTLSFromFile(viper.GetString("certFile"), "")
 
 	// Set up a connection to the server.
-	conn, err := grpc.Dial(viper.GetString("salesAdminAddress"), grpc.WithTransportCredentials(creds))
+	// conn, err := grpc.Dial(viper.GetString("salesAdminAddress"), grpc.WithTransportCredentials(creds))
+	conn, err := grpc.Dial(viper.GetString("salesAdminAddress"), grpc.WithInsecure())
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
 	}
@@ -69,7 +71,7 @@ func getOrders() {
 	log.Printf("Orders: %v", r.GetOrders())
 }
 
-// uploadCmd configures the uploader subcommand start
+// getOrdersCmd configures the getorders subcommand start
 var getOrdersCmd = &cobra.Command{
 	Use:   "getorders",
 	Short: "request all orders from the salesadmin server",
@@ -79,13 +81,14 @@ var getOrdersCmd = &cobra.Command{
 	},
 }
 
-// getOrders implements the NewSalesAdminClient interface and requests
-// all orders from the salesadmin api
+// getTotalRevenue implements the NewSalesAdminClient interface and requests
+// the total sales revenue from all orders stored in the database
 func getTotalRevenue() {
-	creds, _ := credentials.NewClientTLSFromFile(viper.GetString("certFile"), "")
+	// creds, _ := credentials.NewClientTLSFromFile(viper.GetString("certFile"), "")
 
 	// Set up a connection to the server.
-	conn, err := grpc.Dial(viper.GetString("salesAdminAddress"), grpc.WithTransportCredentials(creds))
+	// conn, err := grpc.Dial(viper.GetString("salesAdminAddress"), grpc.WithTransportCredentials(creds))
+	conn, err := grpc.Dial(viper.GetString("salesAdminAddress"), grpc.WithInsecure())
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
 	}
@@ -101,7 +104,7 @@ func getTotalRevenue() {
 	log.Printf("Total Sales Revenue: %v", r.GetTotalRevenue())
 }
 
-// uploadCmd configures the uploader subcommand start
+// getTotalRevenueCmd configures the getrevenue subcommand start
 var getTotalRevenueCmd = &cobra.Command{
 	Use:   "getrevenue",
 	Short: "request total sales revenue from the salesadmin server",
@@ -111,13 +114,80 @@ var getTotalRevenueCmd = &cobra.Command{
 	},
 }
 
+// getCustomerCount implements the NewSalesAdminClient interface and requests
+// the count of unique customers from the salesadmin api
+func getCustomerCount() {
+	// creds, _ := credentials.NewClientTLSFromFile(viper.GetString("certFile"), "")
+
+	// Set up a connection to the server.
+	// conn, err := grpc.Dial(viper.GetString("salesAdminAddress"), grpc.WithTransportCredentials(creds))
+	conn, err := grpc.Dial(viper.GetString("salesAdminAddress"), grpc.WithInsecure())
+	if err != nil {
+		log.Fatalf("did not connect: %v", err)
+	}
+	defer conn.Close()
+	c := pb.NewSalesAdminServiceClient(conn)
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+	r, err := c.GetCustomerCount(ctx, &pb.CustomerCountRequest{})
+	if err != nil {
+		log.Fatalf("could not get the customer count from the server: %v", err)
+	}
+	log.Printf("Customer count: %v", r.GetCount())
+}
+
+// getCustomerCountCmd configures the getcustomercount subcommand start
+var getCustomerCountCmd = &cobra.Command{
+	Use:   "getcustomercount",
+	Short: "request the count of unique customers from the salesadmin server",
+	Long:  "Send a request to the salesadmin gRPC server for the count of unique customers stored in the database.",
+	Run: func(cmd *cobra.Command, args []string) {
+		getCustomerCount()
+	},
+}
+
+// getMerchantCount implements the NewSalesAdminClient interface and requests
+// the count of unique Mmerchants from the salesadmin api
+func getMerchantCount() {
+	// creds, _ := credentials.NewClientTLSFromFile(viper.GetString("certFile"), "")
+
+	// Set up a connection to the server.
+	// conn, err := grpc.Dial(viper.GetString("salesAdminAddress"), grpc.WithTransportCredentials(creds))
+	conn, err := grpc.Dial(viper.GetString("salesAdminAddress"), grpc.WithInsecure())
+	if err != nil {
+		log.Fatalf("did not connect: %v", err)
+	}
+	defer conn.Close()
+	c := pb.NewSalesAdminServiceClient(conn)
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+	r, err := c.GetMerchantCount(ctx, &pb.MerchantCountRequest{})
+	if err != nil {
+		log.Fatalf("could not get the merchant count from the server: %v", err)
+	}
+	log.Printf("Merchant count: %v", r.GetCount())
+}
+
+// getMerchantCountCmd configures the getmerchantcount subcommand start
+var getMerchantCountCmd = &cobra.Command{
+	Use:   "getmerchantcount",
+	Short: "request the count of unique merchants from the salesadmin server",
+	Long:  "Send a request to the salesadmin gRPC server for the count of unique merchants stored in the database.",
+	Run: func(cmd *cobra.Command, args []string) {
+		getMerchantCount()
+	},
+}
+
 // upload opens the sales file csv, converts it to a slice of byte slices,
 // and executes a FileUpload gRPC request
 func upload() {
-	creds, _ := credentials.NewClientTLSFromFile(viper.GetString("certFile"), "")
+	// creds, _ := credentials.NewClientTLSFromFile(viper.GetString("certFile"), "")
 
 	// Set up a connection to the server.
-	conn, err := grpc.Dial(viper.GetString("salesAdminAddress"), grpc.WithTransportCredentials(creds))
+	// conn, err := grpc.Dial(viper.GetString("salesAdminAddress"), grpc.WithTransportCredentials(creds))
+	conn, err := grpc.Dial(viper.GetString("salesAdminAddress"), grpc.WithInsecure())
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
 	}

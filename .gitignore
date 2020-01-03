@@ -11,3 +11,4 @@
 # run create-certs to get your own
 # dev certs and protect them
 /test/certs/
+.DS_Store

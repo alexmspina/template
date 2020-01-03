@@ -2,7 +2,7 @@
     "certFile": "./test/certs/localhost.cer.pem",
     "keyFile": "./test/certs/localhost.key.pem",
     "caFile": "./test/certs/salesadmin-ca-1.crt",
-    "port": ":50051",
+    "port": ":9090",
     "postgresCertFile": "./test/certs/postgres.cer.pem",
     "postgresKeyFile": "./test/certs/postgres.key.pem",
     "postgresHost": "postgres",

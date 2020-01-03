@@ -2,13 +2,13 @@ package salesadmin
 
 import (
 	"context"
+	"fmt"
 	"net"
 
 	pb "github.com/alexmspina/template/api/salesadminpb"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials"
 )
 
 type server struct {
@@ -23,7 +23,7 @@ func Start() {
 	sugar := logger.Sugar()
 
 	sugar.Info("configuring gRPC credentials")
-	creds, _ := credentials.NewServerTLSFromFile(viper.GetString("certFile"), viper.GetString("keyFile"))
+	// creds, _ := credentials.NewServerTLSFromFile(viper.GetString("certFile"), viper.GetString("keyFile"))
 
 	sugar.Infof("configuring gRPC listening on port %v", viper.GetString("port"))
 	lis, err := net.Listen("tcp", viper.GetString("port"))
@@ -32,7 +32,8 @@ func Start() {
 	}
 
 	sugar.Info("starting SalesAdminServer")
-	s := grpc.NewServer(grpc.Creds(creds))
+	// s := grpc.NewServer(grpc.Creds(creds))
+	s := grpc.NewServer()
 	pb.RegisterSalesAdminServiceServer(s, &server{})
 	if err := s.Serve(lis); err != nil {
 		sugar.Fatalf("failed to serve: %v", err)
@@ -48,6 +49,14 @@ func (s *server) FileUpload(ctx context.Context, in *pb.FileUploadRequest) (*pb.
 
 	sugar.Info("reading FileUploadRequest FileBytes payload")
 	file := in.GetFile()
+	fmt.Printf("file from upload request: %v\n\n", file)
+	if file.FileBytes == nil {
+		sugar.Debugf("file bytes missing", file)
+		errString := "file bytes missing"
+		err := fmt.Errorf("error %v", errString)
+		return &pb.FileUploadResponse{Result: false}, err
+	}
+	sugar.Debugf("file bytes not missing", file)
 	fileBytes := file.FileBytes
 	orders, err := ParseSalesFile(ctx, fileBytes)
 	if err != nil {
@@ -63,7 +72,7 @@ func (s *server) FileUpload(ctx context.Context, in *pb.FileUploadRequest) (*pb.
 	return &pb.FileUploadResponse{Result: true}, nil
 }
 
-// ServeOrders implements the Orders methods of the SalesAdminServiceServer
+// GetAllOrders implements the Orders methods of the SalesAdminServiceServer
 func (s *server) GetAllOrders(ctx context.Context, in *pb.OrdersRequest) (*pb.OrdersResponse, error) {
 	// configure logger
 	logger, _ := zap.NewProduction()
@@ -123,6 +132,68 @@ func (s *server) GetTotalSalesRevenue(ctx context.Context, in *pb.TotalSalesReve
 	sugar.Info("creating TotalSalesRevenueResponse for gRPC method GetTotalSalesRevenue")
 	response := pb.TotalSalesRevenueResponse{
 		TotalRevenue: totalRevenue,
+	}
+
+	return &response, nil
+}
+
+// GetCustomerCount implements the Orders method of the SalesAdminServiceServer
+func (s *server) GetCustomerCount(ctx context.Context, in *pb.CustomerCountRequest) (*pb.CustomerCountResponse, error) {
+	// configure logger
+	logger, _ := zap.NewProduction()
+	defer logger.Sync()
+	sugar := logger.Sugar()
+
+	sugar.Info("calling RunQueryCustomerNames method")
+	orders, err := RunQueryCustomerNames(ctx, queryCustomerNames)
+	if err != nil {
+		return nil, err
+	}
+
+	sugar.Info("calculating unique customer count")
+	customerSet := make(map[string]bool, 0)
+	for _, order := range orders {
+		customer := order.CustomerName
+		if _, ok := customerSet[customer]; ok {
+			continue
+		}
+		customerSet[customer] = true
+	}
+
+	sugar.Info("creating TotalSalesRevenueResponse for gRPC method GetTotalSalesRevenue")
+	response := pb.CustomerCountResponse{
+		Count: int64(len(customerSet)),
+	}
+
+	return &response, nil
+}
+
+// GetMerchantCount implements the GetMerchantCount method of the SalesAdminServiceServer
+func (s *server) GetMerchantCount(ctx context.Context, in *pb.MerchantCountRequest) (*pb.MerchantCountResponse, error) {
+	// configure logger
+	logger, _ := zap.NewProduction()
+	defer logger.Sync()
+	sugar := logger.Sugar()
+
+	sugar.Info("calling RunQueryMerchantNames method")
+	orders, err := RunQueryMerchantNames(ctx, queryMerchantNames)
+	if err != nil {
+		return nil, err
+	}
+
+	sugar.Info("calculating unique merchant count")
+	merchantSet := make(map[string]bool, 0)
+	for _, order := range orders {
+		merchant := order.MerchantName
+		if _, ok := merchantSet[merchant]; ok {
+			continue
+		}
+		merchantSet[merchant] = true
+	}
+
+	sugar.Info("creating TotalSalesRevenueResponse for gRPC method GetTotalSalesRevenue")
+	response := pb.MerchantCountResponse{
+		Count: int64(len(merchantSet)),
 	}
 
 	return &response, nil
