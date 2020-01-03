@@ -3,8 +3,7 @@ import { useDropzone } from 'react-dropzone'
 import styled from '@emotion/styled'
 import {
   File,
-  FileUploadRequest,
-  FileUploadResponse
+  FileUploadRequest
 } from '../../grpcweb/salesadmin_pb'
 import Widget from '../Widget'
 
