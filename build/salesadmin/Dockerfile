@@ -27,11 +27,11 @@ WORKDIR /root/
 RUN mv ./project/configs/salesadmin/production/config.json .
 #
 ## move necessary certs and keys to root
-RUN mv ./project/test/certs/server.cer.pem .
-RUN mv ./project/test/certs/server.key.pem .
-RUN mv ./project/test/certs/salesadmin-ca-1.crt .
-RUN mv ./project/test/certs/postgres.cer.pem .
-RUN mv ./project/test/certs/postgres.key.pem .
+# RUN mv ./project/test/certs/server.cer.pem .
+# RUN mv ./project/test/certs/server.key.pem .
+# RUN mv ./project/test/certs/salesadmin-ca-1.crt .
+# RUN mv ./project/test/certs/postgres.cer.pem .
+# RUN mv ./project/test/certs/postgres.key.pem .
 #
 ## remove project source code
 RUN rm -rf /root/project
