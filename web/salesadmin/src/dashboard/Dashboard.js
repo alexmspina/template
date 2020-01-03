@@ -18,6 +18,7 @@ const DashboardContainer = styled.div`
   flex-direction: column;
   align-items: center;
   width: 100%;
+  padding: 5rem 0;
 `
 
 const WidgetContainer = styled.div`
@@ -32,7 +33,6 @@ const Dashboard = props => {
   const { updateView, view } = props
   const [uploadSuccessful, updateUploadSuccessful] = useState(false)
   const client = new SalesAdminServiceClient('http://localhost:8080')
-  console.log('client', client)
 
   const customerCountRequest = new CustomerCountRequest()
   const [customerCount, updateCustomerCount] = useState(0)
@@ -86,12 +86,14 @@ const Dashboard = props => {
   const [loginWidget, setLoginWidget] = useState(null)
 
   const widgetTransitions = useTransition(widgets, null, {
+    config: { friction: 35 },
     from: { transform: 'translate3d(0,1000px,0)', height: '0%' },
     enter: { transform: 'translate3d(0,0px,0)' },
     leave: { transform: 'translate3d(0,1000px,0)', height: '0%' }
   })
 
   const loginTransition = useTransition(loginWidget, null, {
+    config: { friction: 35 },
     from: { transform: 'translate3d(0,-750px,0)', height: '0%' },
     enter: { transform: 'translate3d(0,0,0)' },
     leave: { transform: 'translate3d(0,-750px,0)', height: '0%' }
@@ -99,7 +101,7 @@ const Dashboard = props => {
 
   useEffect(() => {
     if (view === 'login') {
-      setLoginWidget(<Login updateView={updateView} />)
+      setLoginWidget(<WidgetContainer><Login updateView={updateView} /></WidgetContainer>)
       setWidgets(null)
     } else if (view === 'salesReport') {
       setLoginWidget(null)
@@ -116,7 +118,7 @@ const Dashboard = props => {
   }, [view, revenue, customerCount, merchantCount, orders])
 
   return (
-    <DashboardContainer>
+    <DashboardContainer onWheelCapture={e => e.deltaY > 0 && view !== 'salesReport' ? updateView('salesReport') : e.deltaY < 0 && view !== 'login' ? updateView('login') : null}>
       {widgetTransitions.map(({ item, props, key }) => <animated.div key={key} style={props}>{item}</animated.div>)}
       {loginTransition.map(({ item, props, key }) => <animated.div key={key} style={props}>{item}</animated.div>)}
     </DashboardContainer>

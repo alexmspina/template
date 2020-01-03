@@ -66,7 +66,7 @@ const loginView = 'login'
 
 const Menu = props => {
   const { view, updateView } = props
-  const styleProps = useSpring({ transform: view === 'login' ? 'translate3d(0, 105px, 0)' : 'translate3d(0, 0px, 0)' })
+  const styleProps = useSpring({ config: { friction: 35 }, transform: view === 'login' ? 'translate3d(0, 105px, 0)' : 'translate3d(0, 0px, 0)' })
   return (
     <Widget>
       <MenuContent className='sidebar'>
