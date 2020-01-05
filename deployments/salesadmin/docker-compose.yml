@@ -2,7 +2,7 @@ version: "3.7"
 services:
   postgres:
     image: postgres:12.1-alpine
-    command: -c ssl=on -c ssl_cert_file=/var/lib/postgresql/postgres.cer.pem -c ssl_key_file=/var/lib/postgresql/postgres.key.pem
+    # command: -c ssl=on -c ssl_cert_file=/var/lib/postgresql/postgres.cer.pem -c ssl_key_file=/var/lib/postgresql/postgres.key.pem
     environment:
       POSTGRES_USER: salesadmin
       POSTGRES_PASSWORD: salesadmin
@@ -15,20 +15,15 @@ services:
         mode: host
     volumes:
       - ./volumes/postgres:/var/lib/postgresql/data
-      - ../../test/certs/postgres.cer.pem:/var/lib/postgresql/postgres.cer.pem
-      - ../../test/certs/postgres.key.pem:/var/lib/postgresql/postgres.key.pem
       - ../../scripts/postgres/init-db-tables.sh:/docker-entrypoint-initdb.d/init-user-db.sh
-
+      # - ../../test/certs/postgres.cer.pem:/var/lib/postgresql/postgres.cer.pem
+      # - ../../test/certs/postgres.key.pem:/var/lib/postgresql/postgres.key.pem
+      
   godev:
     build:
       context: ../..
       dockerfile: ./build/godev/Dockerfile
     image: template/godev
-    ports:
-      - target: 3000
-        published: 3000
-        protocol: tcp
-        mode: host
     volumes:
       - ../..:/root/project
       - ../../vendor/modules:/go/pkg/mod/cache
@@ -51,6 +46,27 @@ services:
       - ./volumes/certdev/.cache/fisher:/root/.cache/fisher
       - ./volumes/certdev/.local/share:/root/.local/share
       - ./volumes/certdev/.config/nvim/plugged:/root/.config/nvim/plugged
+    stdin_open: true
+    tty: true
+  
+  nodedev:
+    build:
+      context: ../..
+      dockerfile: ./build/nodedev/Dockerfile
+    image: template/nodedev
+    ports:
+      - target: 3000
+        published: 3000
+        protocol: tcp
+        mode: host
+    stdin_open: true
+    tty: true
+
+  rustdev:
+    build:
+      context: ../..
+      dockerfile: ./build/rustdev/Dockerfile
+    image: template/rustdev
     stdin_open: true
     tty: true
   
