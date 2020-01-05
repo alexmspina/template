@@ -3,7 +3,7 @@
 # license: ...
 # date: 01/04/2019
 #-------------------------------------------------------------------------------------------------------------
-FROM alexmspina/rust:v0.1.0
+FROM alexmspina/rustdev:v0.1.0
 #
 ## Copy init.vim to container so plug can install vim packages
 COPY ./build/rustdev/init.vim /root/.config/nvim/init.vim
