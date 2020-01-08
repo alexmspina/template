@@ -32,55 +32,69 @@ const WidgetContainer = styled.div`
 const Dashboard = props => {
   const { updateView, view } = props
   const [uploadSuccessful, updateUploadSuccessful] = useState(false)
-  const client = new SalesAdminServiceClient('http://localhost:8080')
+  // const client = new SalesAdminServiceClient('http://localhost:8080')
 
-  const customerCountRequest = new CustomerCountRequest()
+  const [client, updateClient] = useState(null)
+  useEffect(() => {
+    const grpcClient = new SalesAdminServiceClient('http://localhost:8080')
+    updateClient(grpcClient)
+  }, [])
+
   const [customerCount, updateCustomerCount] = useState(0)
   useEffect(() => {
-    client.getCustomerCount(customerCountRequest, {}, (err, customerCountResponse) => {
-      if (err) {
-        console.error('gRPC error', err)
-      }
-      updateCustomerCount(customerCountResponse.array[0])
-      updateUploadSuccessful(false)
-    })
-  }, [view, uploadSuccessful])
+    
+    if (client !== null) {
+      const customerCountRequest = new CustomerCountRequest()
+      client.getCustomerCount(customerCountRequest, {}, (err, response) => {
+        if (err) {
+          console.error('gRPC error', err)
+        }
+          updateCustomerCount(response.array[0])
+          updateUploadSuccessful(false)
+    })}
+  }, [client, view, uploadSuccessful])
 
-  const merchantCountRequest = new MerchantCountRequest()
   const [merchantCount, updateMerchantCount] = useState(0)
   useEffect(() => {
-    client.getMerchantCount(merchantCountRequest, {}, (err, response) => {
+    if (client !== null) {
+      const merchantCountRequest = new MerchantCountRequest()
+      client.getMerchantCount(merchantCountRequest, {}, (err, response) => {
       if (err) {
         console.error('gRPC error', err)
+      } else if (client !== null) {
+        updateMerchantCount(response.array[0])
+        updateUploadSuccessful(false)
       }
-      updateMerchantCount(response.array[0])
-      updateUploadSuccessful(false)
-    })
-  }, [view, uploadSuccessful])
+    })}
+  }, [client, view, uploadSuccessful])
 
-  const ordersRequest = new OrdersRequest()
   const [orders, updateOrders] = useState([])
   useEffect(() => {
+    if (client !== null)
+      {const ordersRequest = new OrdersRequest()
     client.getAllOrders(ordersRequest, {}, (err, response) => {
       if (err) {
         console.error('gRPC error', err)
+      } else if (client !== null) {
+        updateOrders(response ? response.array[0] : [])
+        updateUploadSuccessful(false)
       }
-      updateOrders(response ? response.array[0] : [])
-      updateUploadSuccessful(false)
-    })
-  }, [view, uploadSuccessful])
+    })}
+  }, [client, view, uploadSuccessful])
 
-  const revenueRequest = new TotalSalesRevenueRequest()
   const [revenue, updateRevenue] = useState(0)
   useEffect(() => {
+    if (client !== null) {
+      const revenueRequest = new TotalSalesRevenueRequest()
     client.getTotalSalesRevenue(revenueRequest, {}, (err, response) => {
       if (err) {
         console.error('gRPC error', err)
+      } else if (client !== null) {
+        updateRevenue(response.array[0])
+        updateUploadSuccessful(false)
       }
-      updateRevenue(response.array[0])
-      updateUploadSuccessful(false)
-    })
-  }, [view, uploadSuccessful])
+    })}
+  }, [client, view, uploadSuccessful])
 
   const [widgets, setWidgets] = useState(null)
   const [loginWidget, setLoginWidget] = useState(null)
@@ -115,7 +129,7 @@ const Dashboard = props => {
         </WidgetContainer>
       ])
     }
-  }, [view, revenue, customerCount, merchantCount, orders])
+  }, [client, updateView, view, revenue, customerCount, merchantCount, orders])
 
   return (
     <DashboardContainer onWheelCapture={e => e.deltaY > 0 && view !== 'salesReport' ? updateView('salesReport') : e.deltaY < 0 && view !== 'login' ? updateView('login') : null}>
