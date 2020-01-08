@@ -54,6 +54,13 @@ services:
       context: ../..
       dockerfile: ./build/nodedev/Dockerfile
     image: template/nodedev
+    volumes:
+      - ../../test/certs:/root/certs
+      - ../../scripts/auth:/root/scripts
+      - ./volumes/nodedev/.config/fisher:/root/.config/fisher
+      - ./volumes/nodedev/.cache/fisher:/root/.cache/fisher
+      - ./volumes/nodedev/.local/share:/root/.local/share
+      - ./volumes/nodedev/.config/nvim/plugged:/root/.config/nvim/plugged
     ports:
       - target: 3000
         published: 3000
@@ -67,6 +74,13 @@ services:
       context: ../..
       dockerfile: ./build/rustdev/Dockerfile
     image: template/rustdev
+    volumes:
+      - ../../test/certs:/root/certs
+      - ../../scripts/auth:/root/scripts
+      - ./volumes/rustdev/.config/fisher:/root/.config/fisher
+      - ./volumes/rustdev/.cache/fisher:/root/.cache/fisher
+      - ./volumes/rustdev/.local/share:/root/.local/share
+      - ./volumes/rustdev/.config/nvim/plugged:/root/.config/nvim/plugged
     stdin_open: true
     tty: true
   

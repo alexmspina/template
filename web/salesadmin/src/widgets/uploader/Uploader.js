@@ -42,7 +42,7 @@ const Uploader = props => {
         })
       }
     })
-  }, [])
+  }, [grpcClient, updateUploadSuccessful])
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop })
   return (
