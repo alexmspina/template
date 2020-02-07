@@ -5,6 +5,9 @@
 #-------------------------------------------------------------------------------------------------------------
 FROM alexmspina/nodedev:v0.1.0
 #
+## Install standard a global package for ALE integration
+RUN npm install -g standard
+#
 ## Copy init.vim to container so plug can install vim packages
 COPY ./build/nodedev/init.vim /root/.config/nvim/init.vim
 #

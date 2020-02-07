@@ -19,7 +19,7 @@ services:
   envoy:
     build:
       context: ../..
-      dockerfile: ./build/envoy/Dockerfile
+      dockerfile: ./build/salesadmin/envoy/Dockerfile
     image: template/envoy
     ports:
       - "8080:8080"
@@ -38,7 +38,7 @@ services:
   server:
     build:
       context: ../..
-      dockerfile: ./build/salesadmin/Dockerfile
+      dockerfile: ./build/salesadmin/server/Dockerfile
     image: template/salesadmin
     ports:
       - target: 9090
