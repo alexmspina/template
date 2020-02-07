@@ -36,22 +36,23 @@ const Dashboard = props => {
 
   const [client, updateClient] = useState(null)
   useEffect(() => {
-    const grpcClient = new SalesAdminServiceClient('http://localhost:8080')
+    const grpcClient = new SalesAdminServiceClient('/api/')
     updateClient(grpcClient)
   }, [])
 
   const [customerCount, updateCustomerCount] = useState(0)
   useEffect(() => {
-    
     if (client !== null) {
       const customerCountRequest = new CustomerCountRequest()
       client.getCustomerCount(customerCountRequest, {}, (err, response) => {
         if (err) {
-          console.error('gRPC error', err)
+          console.error('customer count gRPC error', err, customerCountRequest)
         }
-          updateCustomerCount(response.array[0])
-          updateUploadSuccessful(false)
-    })}
+        console.log('customer count response', response)
+        updateCustomerCount(response.array[0])
+        updateUploadSuccessful(false)
+      })
+    }
   }, [client, view, uploadSuccessful])
 
   const [merchantCount, updateMerchantCount] = useState(0)
@@ -59,41 +60,47 @@ const Dashboard = props => {
     if (client !== null) {
       const merchantCountRequest = new MerchantCountRequest()
       client.getMerchantCount(merchantCountRequest, {}, (err, response) => {
-      if (err) {
-        console.error('gRPC error', err)
-      } else if (client !== null) {
-        updateMerchantCount(response.array[0])
-        updateUploadSuccessful(false)
-      }
-    })}
+        if (err) {
+          console.error('merchant count gRPC error', err)
+        } else if (client !== null) {
+          console.log('mechant count response', response)
+          updateMerchantCount(response.array[0])
+          updateUploadSuccessful(false)
+        }
+      })
+    }
   }, [client, view, uploadSuccessful])
 
   const [orders, updateOrders] = useState([])
   useEffect(() => {
-    if (client !== null)
-      {const ordersRequest = new OrdersRequest()
-    client.getAllOrders(ordersRequest, {}, (err, response) => {
-      if (err) {
-        console.error('gRPC error', err)
-      } else if (client !== null) {
-        updateOrders(response ? response.array[0] : [])
-        updateUploadSuccessful(false)
-      }
-    })}
+    if (client !== null) {
+      const ordersRequest = new OrdersRequest()
+      client.getAllOrders(ordersRequest, {}, (err, response) => {
+        if (err) {
+          console.error('orders gRPC error', err)
+        } else if (client !== null) {
+          console.log('orders response', response)
+          updateOrders(response ? response.array[0] : [])
+          updateUploadSuccessful(false)
+        }
+      })
+    }
   }, [client, view, uploadSuccessful])
 
   const [revenue, updateRevenue] = useState(0)
   useEffect(() => {
     if (client !== null) {
       const revenueRequest = new TotalSalesRevenueRequest()
-    client.getTotalSalesRevenue(revenueRequest, {}, (err, response) => {
-      if (err) {
-        console.error('gRPC error', err)
-      } else if (client !== null) {
-        updateRevenue(response.array[0])
-        updateUploadSuccessful(false)
-      }
-    })}
+      client.getTotalSalesRevenue(revenueRequest, {}, (err, response) => {
+        if (err) {
+          console.error('revenue gRPC error', err)
+        } else if (client !== null) {
+          console.log('revenue response', response)
+          updateRevenue(response.array[0])
+          updateUploadSuccessful(false)
+        }
+      })
+    }
   }, [client, view, uploadSuccessful])
 
   const [widgets, setWidgets] = useState(null)

@@ -8,6 +8,10 @@ Plug 'tpope/vim-surround'
 Plug 'ctrlpvim/ctrlp.vim'
 Plug 'bling/vim-airline'
 Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
+Plug 'dag/vim-fish'
+Plug 'tpope/vim-eunuch'
+Plug 'elzr/vim-json'
+Plug 'ekalinin/dockerfile.vim'
 
 " List ends here. Plugins become visible to Vim after this call.
 call plug#end()

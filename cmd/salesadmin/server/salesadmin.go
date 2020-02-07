@@ -1,6 +1,8 @@
 package main
 
 import (
+	"context"
+
 	"github.com/alexmspina/template/internal/salesadmin"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -31,6 +33,8 @@ func Execute() error {
 }
 
 func init() {
+	// configure init context
+	ctx := context.Background()
 	// configure logger
 	logger, _ := zap.NewProduction()
 	defer logger.Sync()
@@ -63,6 +67,13 @@ func init() {
 		for k, v := range viper.AllSettings() {
 			sugar.Infof("Config parameter %v: %v", k, v)
 		}
+	}
+
+	// initialize database
+	sugar.Info("creating orders table in the database")
+	err = salesadmin.CreateOrdersTable(ctx)
+	if err != nil {
+		sugar.Debugf("error %v creating orders table in the database", err)
 	}
 
 	sugar.Info("configuring subcommands")

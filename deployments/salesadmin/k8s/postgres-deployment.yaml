@@ -1,0 +1,87 @@
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   annotations:
+#     kompose.cmd: kompose convert -f ./docker-compose-production.yml
+#     kompose.version: 1.20.0 ()
+#   creationTimestamp: null
+#   labels:
+#     io.kompose.service: postgres
+#   name: postgres
+# spec:
+#   selector:
+#     matchLabels:
+#       io.kompose.service: postgres
+#   replicas: 1
+#   strategy:
+#     type: Recreate
+#   template:
+#     metadata:
+#       annotations:
+#         kompose.cmd: kompose convert -f ./docker-compose-production.yml
+#         kompose.version: 1.20.0 ()
+#       creationTimestamp: null
+#       labels:
+#         io.kompose.service: postgres
+#     spec:
+#       containers:
+#       - env:
+#         - name: POSTGRES_DB
+#           value: salesadmin
+#         - name: POSTGRES_HOST
+#           value: postgres
+#         - name: POSTGRES_PASSWORD
+#           value: salesadmin
+#         - name: POSTGRES_USER
+#           value: salesadmin
+#         image: postgres:12.1-alpine
+#         name: postgres
+#         ports:
+#         - containerPort: 5432
+#         resources: {}
+#         volumeMounts:
+#         - mountPath: /var/lib/postgresql/data
+#           name: postgres-claim0
+#         - mountPath: /docker-entrypoint-initdb.d/init-user-db.sh
+#           name: postgres-claim1
+#       restartPolicy: Always
+#       volumes:
+#       - name: postgres-claim0
+#         persistentVolumeClaim:
+#           claimName: postgres-claim0
+#       - name: postgres-claim1
+#         persistentVolumeClaim:
+#           claimName: postgres-claim1
+# status: {}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+  labels:
+    app: postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:12.1-alpine
+        imagePullPolicy: "IfNotPresent"
+        ports:
+          - containerPort: 5432
+        envFrom:
+          - configMapRef:
+              name: postgres-config
+        volumeMounts:
+          - mountPath: /var/lib/postgresql/data
+            name: postgredb
+      volumes:
+        - name: postgredb
+          persistentVolumeClaim:
+            claimName: postgres-pv-claim

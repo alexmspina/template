@@ -7,6 +7,10 @@ Plug 'mattn/emmet-vim'
 Plug 'tpope/vim-surround'
 Plug 'ctrlpvim/ctrlp.vim'
 Plug 'bling/vim-airline'
+Plug 'tpope/vim-eunuch'
+Plug 'dag/vim-fish'
+Plug 'elzr/vim-json'
+Plug 'ekalinin/dockerfile.vim'
 
 " List ends here. Plugins become visible to Vim after this call.
 call plug#end()

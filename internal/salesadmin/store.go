@@ -27,6 +27,18 @@ type Order struct {
 	MerchantAddress string
 }
 
+const createOrdersTable = `
+CREATE TABLE orders (
+	order_id SERIAL,
+	customer_name TEXT,
+	item_description TEXT,
+	item_price FLOAT,
+	quantity INT,
+	merchant_name TEXT,
+	merchant_address TEXT
+);
+`
+
 const insertOrder = `
 INSERT INTO orders (customer_name, item_description, item_price, quantity, merchant_name, merchant_address)
 VALUES ($1, $2, $3, $4, $5, $6)`
@@ -95,6 +107,40 @@ func ParseSalesFile(ctx context.Context, file [][]byte) ([]Order, error) {
 		orders = append(orders, tempOrder)
 	}
 	return orders, nil
+}
+
+// CreateOrdersTable connects to the postgres database and creates
+// the Orders table
+func CreateOrdersTable(ctx context.Context) error {
+	// configure logger
+	logger, _ := zap.NewProduction()
+	defer logger.Sync()
+	sugar := logger.Sugar()
+
+	// psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslkey=%s sslcert=%s sslrootcert=%s sslmode=verify-ca",
+	// viper.GetString("postgresHost"), viper.GetInt("postgresPort"), viper.GetString("postgresUser"), viper.GetString("postgresPassword"),
+	// viper.GetString("postgresDB"), viper.GetString("postgresKeyFile"), viper.GetString("postgresCertFile"), viper.GetString("caFile"))
+	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
+		viper.GetString("postgresHost"), viper.GetInt("postgresPort"), viper.GetString("postgresUser"), viper.GetString("postgresPassword"),
+		viper.GetString("postgresDB"))
+
+	sugar.Info("connecting to postgres salesadmin database")
+	db, err := sql.Open("postgres", psqlInfo)
+	if err != nil {
+		dbConnectionError := fmt.Errorf("error %v while opening db connection", err)
+		return dbConnectionError
+	}
+	defer db.Close()
+
+	sugar.Info("inserting orders into salesadming database")
+
+	_, err = db.ExecContext(ctx, createOrdersTable)
+	if err != nil {
+		initializeDBError := fmt.Errorf("error %v while initilizing the database", err)
+		return initializeDBError
+	}
+
+	return nil
 }
 
 // InsertOrders executes the insertOder sql statement for each order in the order slice
