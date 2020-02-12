@@ -20,7 +20,7 @@ RUN git config --global user.name "alexmspina"
 #
 ## Copy git crdentials and setup credential.store
 COPY ./test/secrets/.git-credentials .
-RUN git config --global credential.helper 'store --file ./.git-credentials'
+RUN git config --global credential.helper 'store --file /root/.git-credentials'
 #
 ## copy project directory to root/{project_name}
 COPY . ./project
