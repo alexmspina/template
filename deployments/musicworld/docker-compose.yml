@@ -6,6 +6,8 @@ services:
       context: ../..
       dockerfile: ./build/godev/Dockerfile
     image: template/godev
+    env_file:
+      - ../../test/secrets/github.env
     volumes:
       - ../..:/root/project
       - ../../vendor/modules:/go/pkg/mod/cache
@@ -21,6 +23,8 @@ services:
       context: ../..
       dockerfile: ./build/rustdev/Dockerfile
     image: template/rustdev
+    env_file:
+      - ../../test/secrets/github.env
     volumes:
       - ../..:/root/project
       - ../../test/certs:/root/certs

@@ -14,6 +14,10 @@ RUN nvim +PlugInstall +qall
 ## switch to root directory
 WORKDIR /root
 #
+## Input git username and email
+RUN git config --global user.email "alexmspina@icloud.com"
+RUN git config --global user.name "alexmspina"
+#
 ## Copy git crdentials and setup credential.store
 COPY ./test/secrets/.git-credentials .
 RUN git config --global credential.helper --file ./.git-credentials

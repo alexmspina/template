@@ -1,5 +1,5 @@
-# Portapp
-### A distributed system leveraging Envoy, gRPC, Kafka, and Postgres
+# template
+### A development repository with sandboxed containers for language specific experiments
 
 
 *Note about `create_certs.fish`*
