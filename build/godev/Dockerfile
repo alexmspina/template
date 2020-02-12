@@ -14,6 +14,10 @@ RUN nvim +PlugInstall +qall
 ## switch to root directory
 WORKDIR /root
 #
+## Copy git crdentials and setup credential.store
+COPY ./test/secrets/.git-credentials .
+RUN git config --global credential.helper --file ./.git-credentials
+#
 ## copy project directory to root/{project_name}
 COPY . ./project
 #
@@ -22,6 +26,7 @@ WORKDIR /root/project
 #
 ## download dependencies from go.mod and go.sum
 RUN go get golang.org/x/tools/gopls@latest && \
+    go get github.com/cucumber/godog/cmd/godog && \
     go mod download
 #
 ## start z shell

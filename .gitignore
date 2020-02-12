@@ -12,3 +12,6 @@
 # dev certs and protect them
 /test/certs/
 .DS_Store
+
+# ignore all secrets
+test/secrets/
