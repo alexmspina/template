@@ -5,6 +5,10 @@
 #-------------------------------------------------------------------------------------------------------------
 FROM alexmspina/godev:v0.3.0
 #
+## Install docker for testing purposes
+RUN apk add --update docker openrc
+RUN rc-update add docker boot 
+#
 ## Copy init.vim to container so plug can install vim packages
 COPY ./build/godev/init.vim /root/.config/nvim/init.vim
 #

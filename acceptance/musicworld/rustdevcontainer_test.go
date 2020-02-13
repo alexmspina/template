@@ -77,7 +77,10 @@ func userRunsMusicworldSpinDevcontainer() error {
 	spinMusicworldDevContainer := exec.Command("musicworld", "spin", "devcontainer")
 	err := spinMusicworldDevContainer.Run()
 	if err != nil {
-		return fmt.Errorf("error %v occurred while attempting to execute 'musicworld spin devcontainer'", err)
+		return fmt.Errorf(
+			"error %v occurred while calling 'musicworld spin devcontainer'",
+			err,
+		)
 	}
 
 	return nil
@@ -85,7 +88,9 @@ func userRunsMusicworldSpinDevcontainer() error {
 
 func thereIsARustdevContainerRunning() error {
 
-	checkForMusicworldDevContainer := exec.Command("docker", "exec", "-it", "musicworld_dev", userShell.String())
+	checkForMusicworldDevContainer := exec.Command("docker", "exec", "-itd",
+		"musicworld_dev", "fish",
+	)
 
 	err := checkForMusicworldDevContainer.Run()
 	if err != nil {

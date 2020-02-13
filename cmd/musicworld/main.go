@@ -1,10 +1,11 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/alexmspina/template/internal/musicworld"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"go.uber.org/zap"
 )
 
 func main() {
@@ -15,7 +16,8 @@ var (
 	rootCmd = &cobra.Command{
 		Use:   "musicworld COMMAND",
 		Short: "Mix it up!",
-		Long: `A toolset for building interactive
+		Long: `
+A toolset for building interactive
 audio-visual experiences with
 WASM.
 
@@ -26,31 +28,16 @@ Commands:
 
 // Execute executes the root command.
 func Execute() error {
-	// configure logger
-	logger, _ := zap.NewProduction()
-	defer logger.Sync()
-	sugar := logger.Sugar()
-
-	sugar.Info("executing root command")
 	return rootCmd.Execute()
 }
 
 func init() {
-	// configure init context
-	// ctx := context.Background()
-	// configure logger
-	logger, _ := zap.NewProduction()
-	defer logger.Sync()
-	sugar := logger.Sugar()
-
-	// check for config files
-	sugar.Info("checking for config files")
+	// search for config files
 	viper.SetConfigName("config")
 	viper.AddConfigPath("./configs/musicworld/dev")
 	viper.AddConfigPath(".")
 
 	// set default config values
-	sugar.Info("setting default config values")
 	viper.SetDefault("certFile", "./server.cer.pem")
 	viper.SetDefault("keyFile", "./server.key.pem")
 	viper.SetDefault("caFile", "./musicworld-ca-1.crt")
@@ -63,34 +50,29 @@ func init() {
 	viper.SetDefault("postgresDB", "musicworld")
 	viper.SetDefault("postgresPassword", "musicworld")
 
-	err := viper.ReadInConfig()
-	if err != nil {
-		sugar.Debug(" error reading config values")
-	} else {
-		for k, v := range viper.AllSettings() {
-			sugar.Infof("Config parameter %v: %v", k, v)
-		}
-	}
-
-	// initialize database
-	// sugar.Info("this is where the postgres init script will go")
-	// err = salesadmin.CreateOrdersTable(ctx)
-	// if err != nil {
-	//     	sugar.Debugf("error %v creating orders table in the database", err)
-	// }
-
-	sugar.Info("configuring subcommands")
+	// add subcommands to root command, musicworld
 	rootCmd.AddCommand(spinCmd)
 }
 
 var spinCmd = &cobra.Command{
 	Use:   "spin SERIVCE",
 	Short: "spin up some vinyl!",
-	Long: `Start a service
+	Long: `
+Start a service
 
 Services:
   devcontainer		a general rust-alpine image with terminal based dev tools`,
 	Run: func(cmd *cobra.Command, args []string) {
-		musicworld.Spin()
+		if len(args) == 0 {
+			fmt.Print(`
+"musicworld spin" requires exactly one argument.
+
+See 'musicworld spin --help'.
+
+Usage: musicworld spin SERVICE
+`)
+		} else {
+			musicworld.Spin(args[0])
+		}
 	},
 }

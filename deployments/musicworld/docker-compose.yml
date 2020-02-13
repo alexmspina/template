@@ -15,6 +15,7 @@ services:
       - ./volumes/godev/.cache/fisher:/root/.cache/fisher
       - ./volumes/godev/.local/share:/root/.local/share
       - ./volumes/godev/.config/nvim/plugged:/root/.config/nvim/plugged
+      - /var/run/docker.sock:/var/run/docker.sock:rw  
     stdin_open: true
     tty: true
     
