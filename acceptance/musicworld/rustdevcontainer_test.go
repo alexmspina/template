@@ -74,7 +74,7 @@ func aRunningShell() error {
 }
 
 func userRunsMusicworldSpinDevcontainer() error {
-	
+
 	buildMusicworld := exec.Command("go", "build", "-o", "musicworld", "../../cmd/musicworld/main.go")
 	err := buildMusicworld.Run()
 	if err != nil {
@@ -82,14 +82,7 @@ func userRunsMusicworldSpinDevcontainer() error {
 			"error %v trying to build musicworld", err)
 	}
 
-	installMusicworld := exec.Command("mv", "musicworld", "/go/bin/")
-	err = installMusicworld.Run()
-	if err != nil {
-		return fmt.Errorf(
-			"error %v occurred while installing (moving) musicworld ro /go/bin/", err)
-	}
-
-	spinMusicworldDevContainer := exec.Command("musicworld", "spin", "devcontainer")
+	spinMusicworldDevContainer := exec.Command("./musicworld", "spin", "devcontainer")
 	err = spinMusicworldDevContainer.Run()
 	if err != nil {
 		return fmt.Errorf(
