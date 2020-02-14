@@ -78,15 +78,13 @@ func userRunsMusicworldSpinDevcontainer() error {
 	buildMusicworld := exec.Command("go", "build", "-o", "musicworld", "../../cmd/musicworld/main.go")
 	err := buildMusicworld.Run()
 	if err != nil {
-		return fmt.Errorf(
-			"error %v trying to build musicworld", err)
+		return fmt.Errorf("error %v trying to build musicworld", err)
 	}
 
 	spinMusicworldDevContainer := exec.Command("./musicworld", "spin", "devcontainer")
 	err = spinMusicworldDevContainer.Run()
 	if err != nil {
-		return fmt.Errorf(
-			"error %v occurred while calling 'musicworld spin devcontainer'", err)
+		return fmt.Errorf("error %v occurred while calling 'musicworld spin devcontainer'", err)
 	}
 
 	return nil
@@ -94,7 +92,7 @@ func userRunsMusicworldSpinDevcontainer() error {
 
 func thereIsARustdevContainerRunning() error {
 
-	checkForMusicworldDevContainer := exec.Command("docker", "exec", "-itd", "musicworld_dev", "fish")
+	checkForMusicworldDevContainer := exec.Command("docker", "exec", "musicworld_dev", "fish")
 
 	err := checkForMusicworldDevContainer.Run()
 	if err != nil {
