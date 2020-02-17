@@ -92,10 +92,19 @@ func userRunsMusicworldSpinDevcontainer() error {
 
 func thereIsARustdevContainerRunning() error {
 
+	dockerPs := exec.Command("docker", "ps")
+	var psResult bytes.Buffer
+	dockerPs.Stdout = &psResult
+	err := dockerPs.Run()
+	if err != nil {
+		return fmt.Errorf("error %v calling docker ps", err)
+	}
+	fmt.Println(psResult.String())
+
 	checkForMusicworldDevContainer := exec.Command("sh", "../../scripts/musicworld/checkForContainer.sh")
 	var echoed bytes.Buffer
 	checkForMusicworldDevContainer.Stdout = &echoed
-	err := checkForMusicworldDevContainer.Run()
+	err = checkForMusicworldDevContainer.Run()
 	if err != nil {
 		return fmt.Errorf("error %v running checkForContainer script", err)
 	}
