@@ -1,34 +1,12 @@
 package main
 
 import (
-	"fmt"
-
 	"github.com/alexmspina/template/internal/musicworld"
-	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
 func main() {
-	Execute()
-}
-
-var (
-	rootCmd = &cobra.Command{
-		Use:   "musicworld COMMAND",
-		Short: "Mix it up!",
-		Long: `
-A toolset for building interactive
-audio-visual experiences with
-WASM.
-
-Commands:
-  spin		start a service`,
-	}
-)
-
-// Execute executes the root command.
-func Execute() error {
-	return rootCmd.Execute()
+	musicworld.Execute()
 }
 
 func init() {
@@ -49,30 +27,4 @@ func init() {
 	viper.SetDefault("postgresUser", "musicworld")
 	viper.SetDefault("postgresDB", "musicworld")
 	viper.SetDefault("postgresPassword", "musicworld")
-
-	// add subcommands to root command, musicworld
-	rootCmd.AddCommand(spinCmd)
-}
-
-var spinCmd = &cobra.Command{
-	Use:   "spin SERIVCE",
-	Short: "spin up some vinyl!",
-	Long: `
-Start a service
-
-Services:
-  devcontainer		a general rust-alpine image with terminal based dev tools`,
-	Run: func(cmd *cobra.Command, args []string) {
-		if len(args) == 0 {
-			fmt.Print(`
-"musicworld spin" requires exactly one argument.
-
-See 'musicworld spin --help'.
-
-Usage: musicworld spin SERVICE
-`)
-		} else {
-			musicworld.Spin(args[0])
-		}
-	},
 }
