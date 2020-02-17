@@ -101,24 +101,16 @@ func thereIsARustdevContainerRunning() error {
 	}
 	fmt.Println(psResult.String())
 
-	checkForMusicworldDevContainer := exec.Command("sh", "../../scripts/musicworld/checkForContainer.sh")
-	var echoed bytes.Buffer
-	checkForMusicworldDevContainer.Stdout = &echoed
-	err = checkForMusicworldDevContainer.Run()
-	if err != nil {
-		return fmt.Errorf("error %v running checkForContainer script", err)
-	}
-	fmt.Println(echoed.String())
 	t := &testing.T{}
 
 	godogAssertion := assert.New(t)
 
-	if godogAssertion.Contains(echoed.String(), "musicworld_dev exited") {
+	if godogAssertion.Contains(psResult.String(), "exited") {
 		containerExitedError := errors.New("the musicworld_dev container exited")
 		return containerExitedError
 	}
 
-	if godogAssertion.Contains(echoed.String(), "could not find musicworld_dev") {
+	if len(psResult.String()) == 0 {
 		containerNotFoundError := errors.New("could not find the musicworld_dev container")
 		return containerNotFoundError
 	}

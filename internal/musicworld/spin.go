@@ -13,10 +13,16 @@ const (
 func Spin(service string) {
 	fmt.Printf("spinning up dat %v track!\n\n", service)
 
-	runDevContainerCmd := exec.Command("docker", "run", "-itd", "--name",
-		"musicworld_dev", "template/rustdev")
+	pullDevContainerCmd := exec.Command("docker", "pull", "alexmspina/musicworld-dev:latest")
+	err := pullDevContainerCmd.Run()
+	if err != nil {
+		pullDevContainerError := fmt.Errorf("error %v occurred while attempting to pull alexmspina/musicworld-dev container", err)
+		fmt.Println(pullDevContainerError)
+	}
 
-	err := runDevContainerCmd.Run()
+	runDevContainerCmd := exec.Command("docker", "run", "-itd", "--name", "musicworld_dev", "alexmspina/musicworld-dev")
+
+	err = runDevContainerCmd.Run()
 	if err != nil {
 		runDevContainerCmdErr := fmt.Errorf(
 			"error %v occurred while spinning up the musicworld_dev container",
