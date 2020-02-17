@@ -92,11 +92,32 @@ func userRunsMusicworldSpinDevcontainer() error {
 
 func thereIsARustdevContainerRunning() error {
 
-	checkForMusicworldDevContainer := exec.Command("docker", "exec", "musicworld_dev", "fish")
-
+	checkForMusicworldDevContainer := exec.Command("sh", "../../scripts/musicworld/checkForContainer.sh")
+	var echoed bytes.Buffer
+	checkForMusicworldDevContainer.Stdout = &echoed
 	err := checkForMusicworldDevContainer.Run()
 	if err != nil {
-		return fmt.Errorf("error %v while trying to exec into musicworld_dev", err)
+		return fmt.Errorf("error %v running checkForContainer script", err)
+	}
+	fmt.Println(echoed.String())
+	t := &testing.T{}
+
+	godogAssertion := assert.New(t)
+
+	if godogAssertion.Contains(echoed.String(), "musicworld_dev exited") {
+		containerExitedError := errors.New("the musicworld_dev container exited")
+		return containerExitedError
+	}
+
+	if godogAssertion.Contains(echoed.String(), "could not find musicworld_dev") {
+		containerNotFoundError := errors.New("could not find the musicworld_dev container")
+		return containerNotFoundError
+	}
+
+	execIntoMusicWorld := exec.Command("docker", "exec", "-d", "musicworld_dev", "fish")
+	err = execIntoMusicWorld.Run()
+	if err != nil {
+		return fmt.Errorf("error %v while attempting to exec into musicworld_dev", err)
 	}
 
 	return nil
