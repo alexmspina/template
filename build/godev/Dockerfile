@@ -5,6 +5,10 @@
 #-------------------------------------------------------------------------------------------------------------
 FROM alexmspina/godev:v0.3.0
 #
+## Install docker for testing purposes
+RUN apk add --update docker openrc
+RUN rc-update add docker boot 
+#
 ## Copy init.vim to container so plug can install vim packages
 COPY ./build/godev/init.vim /root/.config/nvim/init.vim
 #
@@ -14,6 +18,14 @@ RUN nvim +PlugInstall +qall
 ## switch to root directory
 WORKDIR /root
 #
+## Input git username and email
+RUN git config --global user.email "alexmspina@icloud.com"
+RUN git config --global user.name "alexmspina"
+#
+## Copy git crdentials and setup credential.store
+COPY ./test/secrets/.git-credentials .
+RUN git config --global credential.helper 'store --file /root/.git-credentials'
+#
 ## copy project directory to root/{project_name}
 COPY . ./project
 #
@@ -22,6 +34,7 @@ WORKDIR /root/project
 #
 ## download dependencies from go.mod and go.sum
 RUN go get golang.org/x/tools/gopls@latest && \
+    go get github.com/cucumber/godog/cmd/godog && \
     go mod download
 #
 ## start z shell

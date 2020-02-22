@@ -6,9 +6,12 @@
 /vendor/modules/vcs/
 
 # ignore template executables
-
+/acceptance/musicworld/musicworld
 # ignore certs
 # run create-certs to get your own
 # dev certs and protect them
 /test/certs/
 .DS_Store
+
+# ignore all secrets
+test/secrets/

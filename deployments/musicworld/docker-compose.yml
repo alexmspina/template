@@ -1,0 +1,38 @@
+version: "3.7"
+services:
+      
+  godev:
+    build:
+      context: ../..
+      dockerfile: ./build/godev/Dockerfile
+    image: template/godev
+    env_file:
+      - ../../test/secrets/github.env
+    volumes:
+      - ../..:/root/project
+      - ../../vendor/modules:/go/pkg/mod/cache
+      - ./volumes/godev/.config/fisher:/root/.config/fisher
+      - ./volumes/godev/.cache/fisher:/root/.cache/fisher
+      - ./volumes/godev/.local/share:/root/.local/share
+      - ./volumes/godev/.config/nvim/plugged:/root/.config/nvim/plugged
+      - /var/run/docker.sock:/var/run/docker.sock:rw  
+    stdin_open: true
+    tty: true
+    
+  rustdev:  
+    build:
+      context: ../..
+      dockerfile: ./build/rustdev/Dockerfile
+    image: template/rustdev
+    env_file:
+      - ../../test/secrets/github.env
+    volumes:
+      - ../..:/root/project
+      - ../../test/certs:/root/certs
+      - ../../scripts/auth:/root/scripts
+      - ./volumes/rustdev/.config/fisher:/root/.config/fisher
+      - ./volumes/rustdev/.cache/fisher:/root/.cache/fisher
+      - ./volumes/rustdev/.local/share:/root/.local/share
+      - ./volumes/rustdev/.config/nvim/plugged:/root/.config/nvim/plugged
+    stdin_open: true
+    tty: true
