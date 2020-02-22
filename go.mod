@@ -13,4 +13,5 @@ require (
 	github.com/stretchr/testify v1.2.2
 	go.uber.org/zap v1.10.0
 	google.golang.org/grpc v1.26.0
+	gopkg.in/errgo.v2 v2.1.0 // indirect
 )

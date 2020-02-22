@@ -5,10 +5,6 @@ import (
 	"github.com/spf13/viper"
 )
 
-func main() {
-	musicworld.Execute()
-}
-
 func init() {
 	// search for config files
 	viper.SetConfigName("config")
@@ -27,4 +23,8 @@ func init() {
 	viper.SetDefault("postgresUser", "musicworld")
 	viper.SetDefault("postgresDB", "musicworld")
 	viper.SetDefault("postgresPassword", "musicworld")
+}
+
+func main() {
+	musicworld.Execute()
 }
